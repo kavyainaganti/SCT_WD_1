@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-color: #f7f7f7;
+    }
+
+    #display {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 1em;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    #laps {
+      margin-top: 30px;
+      text-align: left;
+      display: inline-block;
+      list-style: none;
+      padding: 0;
+    }
+
+    #laps li {
+      font-size: 1.2em;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Stopwatch</h1>
+  <div id="display">00:00:00.000</div>
+  <button onclick="startStopwatch()">Start</button>
+  <button onclick="pauseStopwatch()">Pause</button>
+  <button onclick="resetStopwatch()">Reset</button>
+  <button onclick="recordLap()">Lap</button>
+
+  <ul id="laps"></ul>
+
+  <script>
+    let startTime = null;
+    let elapsedTime = 0;
+    let intervalId = null;
+    let laps = [];
+
+    function updateDisplay(time) {
+      const date = new Date(time);
+      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+      const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+      const milliseconds = String(date.getUTCMilliseconds()).padStart(3, '0');
+      document.getElementById('display').textContent = `${minutes}:${seconds}.${milliseconds}`;
+    }
+
+    function startStopwatch() {
+      if (!intervalId) {
+        startTime = Date.now() - elapsedTime;
+        intervalId = setInterval(() => {
+          elapsedTime = Date.now() - startTime;
+          updateDisplay(elapsedTime);
+        }, 10);
+      }
+    }
+
+    function pauseStopwatch() {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+
+    function resetStopwatch() {
+      clearInterval(intervalId);
+      intervalId = null;
+      startTime = null;
+      elapsedTime = 0;
+      laps = [];
+      updateDisplay(0);
+      document.getElementById('laps').innerHTML = '';
+    }
+
+    function recordLap() {
+      if (intervalId) {
+        laps.push(elapsedTime);
+        const lapTime = new Date(elapsedTime);
+        const minutes = String(lapTime.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(lapTime.getUTCSeconds()).padStart(2, '0');
+        const milliseconds = String(lapTime.getUTCMilliseconds()).padStart(3, '0');
+        const lapDisplay = `${minutes}:${seconds}.${milliseconds}`;
+        const li = document.createElement('li');
+        li.textContent = `Lap ${laps.length}: ${lapDisplay}`;
+        document.getElementById('laps').appendChild(li);
+      }
+    }
+  </script>
+</body>
+</html>
